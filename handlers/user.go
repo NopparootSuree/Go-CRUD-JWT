@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/NopparootSuree/go-social/models"
@@ -150,8 +152,13 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
+	num, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		panic(err)
+	}
+
 	user = models.Users{
-		ID:             user.ID,
+		ID:             uint(num),
 		Username:       user.Username,
 		HashedPassword: hashPassword,
 		Fullname:       req.FullName,
@@ -173,7 +180,14 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		CreatedAt: user.CreatedAt,
 	}
 
-	c.JSON(http.StatusOK, response)
+	fmt.Println(result.RowsAffected)
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot update record"})
+	} else {
+		c.JSON(http.StatusOK, response)
+	}
+
 }
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {
@@ -186,5 +200,9 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"Deleted Compleate ID": id})
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "record is not found"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"Success": "removed record"})
+	}
 }

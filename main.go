@@ -14,6 +14,7 @@ func main() {
 
 	r := gin.Default()
 	routers.UserRouter(r, db)
+	routers.PostRouter(r, db)
 
 	r.Run(":8080")
 }
