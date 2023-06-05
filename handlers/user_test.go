@@ -9,21 +9,13 @@ import (
 
 	"github.com/NopparootSuree/go-social/handlers"
 	"github.com/NopparootSuree/go-social/models"
+	"github.com/NopparootSuree/go-social/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
-
-func ClearUsersTable() error {
-	var db *gorm.DB
-	err := db.Delete(&models.Users{}).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 func TestCreateUser(t *testing.T) {
 	// เตรียมฐานข้อมูล MySQL ในหน่วยทดสอบ
@@ -42,10 +34,13 @@ func TestCreateUser(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
+	password, err := utils.HashPassword("password123")
+	assert.NoError(t, err)
+
 	// สร้างข้อมูล JSON สำหรับการสร้างผู้ใช้ใหม่
 	createUserReq := handlers.CreateUserRequest{
 		Username:       "john_doe",
-		HashedPassword: "password123",
+		HashedPassword: password,
 		FullName:       "John Doe",
 		Email:          "john@example.com",
 	}
@@ -72,4 +67,5 @@ func TestCreateUser(t *testing.T) {
 	// ตรวจสอบการเข้ารหัสพาสเวิร์ดที่ถูกต้อง
 	err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(createUserReq.HashedPassword))
 	assert.NoError(t, err)
+
 }

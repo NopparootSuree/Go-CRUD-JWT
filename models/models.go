@@ -6,10 +6,10 @@ import (
 
 type Users struct {
 	ID             uint      `gorm:"primarykey;column:id;autoIncrement"`
-	Username       string    `gorm:"column:username;unique;not null"`
+	Username       string    `gorm:"column:username;not null"`
 	HashedPassword string    `gorm:"column:hashedPassword;not null"`
 	Fullname       string    `gorm:"column:fullName;not null"`
-	Email          string    `gorm:"column:email;index;unique;not null"`
+	Email          string    `gorm:"column:email;index;not null"`
 	CreatedAt      time.Time `gorm:"column:created_at"`
 }
 
