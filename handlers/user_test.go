@@ -203,10 +203,6 @@ func TestUpdateUser(t *testing.T) {
 	// สร้าง UserHandler โดยใช้ฐานข้อมูลที่เตรียมไว้
 	userHandler := handlers.NewUserHandler(db)
 
-	clocks := clock.NewMock()
-	clocks.Set(time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC))
-	clocks.Add(24 * time.Hour)
-
 	password, err := utils.HashPassword("password123")
 	assert.NoError(t, err)
 	// เพิ่มข้อมูลผู้ใช้ในฐานข้อมูลเพื่อใช้ในการทดสอบ
