@@ -11,19 +11,6 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-// Payload contains the payload data of the token
-type Payload struct {
-	Token     string    `json:"token"`
-	Username  string    `json:"username"`
-	IssuedAt  time.Time `json:"issued_at"`
-	ExpiredAt time.Time `json:"expired_at"`
-}
-
-type LoginUserRequest struct {
-	Username string `json:"username" binding:"required,min=6"`
-	Password string `json:"password" binding:"required,min=6"`
-}
-
 type CreateUserRequest struct {
 	Username       string `json:"username" binding:"required,min=6"`
 	HashedPassword string `json:"hashedPassword" binding:"required"`
@@ -67,6 +54,19 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response)
 
+}
+
+// Payload contains the payload data of the token
+type Payload struct {
+	Token     string    `json:"token"`
+	Username  string    `json:"username"`
+	IssuedAt  time.Time `json:"issued_at"`
+	ExpiredAt time.Time `json:"expired_at"`
+}
+
+type LoginUserRequest struct {
+	Username string `json:"username" binding:"required,min=6"`
+	Password string `json:"password" binding:"required,min=6"`
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
