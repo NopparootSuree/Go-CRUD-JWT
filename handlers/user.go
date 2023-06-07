@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/NopparootSuree/go-social/models"
@@ -152,21 +150,14 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	num, err := strconv.ParseUint(id, 10, 32)
-	if err != nil {
-		panic(err)
+	// Prepare the update data
+	updates := map[string]interface{}{
+		"hashedPassword": hashPassword,
+		"fullname":       req.FullName,
 	}
 
-	user = models.Users{
-		ID:             uint(num),
-		Username:       user.Username,
-		HashedPassword: hashPassword,
-		Fullname:       req.FullName,
-		Email:          user.Email,
-		CreatedAt:      user.CreatedAt,
-	}
-
-	result = h.db.Save(&user)
+	// Update the user's information
+	result = h.db.Model(&user).Updates(updates)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
@@ -179,8 +170,6 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 	}
-
-	fmt.Println(result.RowsAffected)
 
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot update record"})

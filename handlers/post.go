@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -172,8 +171,6 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 		Status:    post.Status,
 		CreatedAt: post.CreatedAt,
 	}
-
-	fmt.Println(result.RowsAffected)
 
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot update record"})
