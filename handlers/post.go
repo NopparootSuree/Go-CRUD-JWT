@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/NopparootSuree/go-social/models"
@@ -143,21 +142,13 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 		return
 	}
 
-	num, err := strconv.ParseUint(id, 10, 32)
-	if err != nil {
-		panic(err)
+	updatesPost := map[string]interface{}{
+		"title":  req.Title,
+		"body":   req.Body,
+		"status": req.Status,
 	}
 
-	post = models.Posts{
-		PostID:    uint(num),
-		Title:     req.Title,
-		Body:      req.Body,
-		UserID:    post.UserID,
-		Status:    req.Status,
-		CreatedAt: post.CreatedAt,
-	}
-
-	result = h.db.Save(&post)
+	result = h.db.Model(&post).Updates(updatesPost)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return

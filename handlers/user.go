@@ -151,13 +151,13 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	}
 
 	// Prepare the update data
-	updates := map[string]interface{}{
+	updatesUser := map[string]interface{}{
 		"hashedPassword": hashPassword,
 		"fullname":       req.FullName,
 	}
 
 	// Update the user's information
-	result = h.db.Model(&user).Updates(updates)
+	result = h.db.Model(&user).Updates(updatesUser)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return

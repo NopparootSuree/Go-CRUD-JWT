@@ -3,7 +3,6 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -106,7 +105,6 @@ func TestGetUser(t *testing.T) {
 
 	// เพิ่มข้อมูลผู้ใช้ในฐานข้อมูลเพื่อใช้ในการทดสอบ
 	user := models.Users{
-		ID:        1,
 		Username:  "john_doe",
 		Fullname:  "John Doe",
 		Email:     "john@example.com",
@@ -219,7 +217,6 @@ func TestUpdateUser(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request, _ = http.NewRequest("PUT", "/users/1", bytes.NewReader([]byte(`{"hashedPassword": "test123","fullName": "John Smith"}`)))
-	fmt.Println(c.Request.Body)
 	// // เรียกใช้งาน UpdateUser ผ่าน UserHandler
 	userHandler.UpdateUser(c)
 
