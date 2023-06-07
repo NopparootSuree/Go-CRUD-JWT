@@ -166,7 +166,7 @@ func TestCreateUser(t *testing.T) {
 	createUserJSON, _ := json.Marshal(createUserReq)
 
 	c.Request, _ = http.NewRequest("POST", "/users", bytes.NewReader(createUserJSON))
-	userHandler.CreateUser(c)
+	userHandler.Register(c)
 
 	// ตรวจสอบการสร้างผู้ใช้สำเร็จและรับ JSON กลับจากการเรียกใช้งาน
 	assert.Equal(t, http.StatusCreated, w.Code)

@@ -28,13 +28,6 @@ type CreateUserResponse struct {
 	CreatedAt time.Time `json:"createdAt" binding:"required"`
 }
 
-type CreateUserRequest struct {
-	Username       string `json:"username" binding:"required,min=6"`
-	HashedPassword string `json:"hashedPassword" binding:"required,min=6"`
-	FullName       string `json:"fullName" binding:"required,min=6"`
-	Email          string `json:"email" binding:"required,email"`
-}
-
 type CreateUserUpdateRequest struct {
 	HashedPassword string `json:"hashedPassword" binding:"required,min=6"`
 	FullName       string `json:"fullName" binding:"required,min=6"`
@@ -66,44 +59,6 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
-}
-
-func (h *UserHandler) CreateUser(c *gin.Context) {
-	var req CreateUserRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	hashPassword, err := utils.HashPassword(req.HashedPassword)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	user := models.Users{
-		Username:       req.Username,
-		HashedPassword: hashPassword,
-		Fullname:       req.FullName,
-		Email:          req.Email,
-	}
-
-	result := h.db.Create(&user)
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
-		return
-	}
-
-	response := CreateUserResponse{
-		ID:        user.ID,
-		Username:  user.Username,
-		FullName:  user.Fullname,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt,
-	}
-
-	c.JSON(http.StatusCreated, response)
-
 }
 
 func (h *UserHandler) GetUser(c *gin.Context) {
@@ -176,7 +131,6 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, response)
 	}
-
 }
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {

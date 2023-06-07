@@ -9,6 +9,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var secretKey []byte
+
 func init() {
 	err := godotenv.Load()
 	if err != nil {
@@ -17,14 +19,16 @@ func init() {
 }
 
 func main() {
+	r := gin.Default()
+
 	db, err := utils.ConnectDatabase()
 	if err != nil {
 		panic("Failed connect to Database")
 	}
 
-	r := gin.Default()
 	routers.UserRouter(r, db)
 	routers.PostRouter(r, db)
+	routers.AuthenRouter(r, db)
 
 	r.Run(":8080")
 }
