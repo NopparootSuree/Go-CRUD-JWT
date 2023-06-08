@@ -146,6 +146,6 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "record is not found"})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"Success": "removed record"})
+		c.JSON(http.StatusNoContent, gin.H{"Success": "removed record"})
 	}
 }
