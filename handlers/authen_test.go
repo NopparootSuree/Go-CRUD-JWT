@@ -48,6 +48,13 @@ func TestRegisterUser(t *testing.T) {
 	createUserJSON, _ := json.Marshal(createUserReq)
 
 	c.Request, _ = http.NewRequest("POST", "/register", bytes.NewReader(createUserJSON))
+
+	var existingUser models.Users
+	db.Where("username = ?", createUserReq.Username).Or("email = ?", createUserReq.Email).First(&existingUser)
+	if existingUser.ID != 0 {
+		assert.Fail(t, "User already exists")
+	}
+
 	userHandler.Register(c)
 
 	// ตรวจสอบการสร้างผู้ใช้สำเร็จและรับ JSON กลับจากการเรียกใช้งาน

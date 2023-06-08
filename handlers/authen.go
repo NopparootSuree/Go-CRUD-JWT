@@ -11,6 +11,21 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// จัดการ payload
+type Payload struct {
+	Token     string    `json:"token"`
+	Username  string    `json:"username"`
+	IssuedAt  time.Time `json:"issued_at"`
+	ExpiredAt time.Time `json:"expired_at"`
+}
+
+// จัดการ req ของ login
+type LoginUserRequest struct {
+	Username string `json:"username" binding:"required,min=6"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+// จัดการ req ของ register
 type CreateUserRequest struct {
 	Username       string `json:"username" binding:"required,min=6"`
 	HashedPassword string `json:"hashedPassword" binding:"required"`
@@ -31,6 +46,13 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
+	var existingUser models.Users
+	h.db.Where("username = ?", req.Username).Or("email = ?", req.Email).First(&existingUser)
+	if existingUser.ID != 0 {
+		c.JSON(http.StatusConflict, gin.H{"error": "Username already taken"})
+		return
+	}
+
 	user := models.Users{
 		Username:       req.Username,
 		HashedPassword: hashPassword,
@@ -38,9 +60,9 @@ func (h *UserHandler) Register(c *gin.Context) {
 		Email:          req.Email,
 	}
 
-	result := h.db.Create(&user)
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+	created := h.db.Create(&user)
+	if created.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": created.Error.Error()})
 		return
 	}
 
@@ -54,19 +76,6 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response)
 
-}
-
-// Payload contains the payload data of the token
-type Payload struct {
-	Token     string    `json:"token"`
-	Username  string    `json:"username"`
-	IssuedAt  time.Time `json:"issued_at"`
-	ExpiredAt time.Time `json:"expired_at"`
-}
-
-type LoginUserRequest struct {
-	Username string `json:"username" binding:"required,min=6"`
-	Password string `json:"password" binding:"required,min=6"`
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
