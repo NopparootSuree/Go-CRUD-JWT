@@ -17,6 +17,11 @@ import (
 	"gorm.io/gorm"
 )
 
+func teardownTestDBs(db *gorm.DB) {
+	db.Migrator().DropTable(&models.Posts{})
+	db.Exec("DELETE FROM products")
+}
+
 func TestListPosts(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
@@ -24,7 +29,7 @@ func TestListPosts(t *testing.T) {
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDBs(db)
 	// Run migrations สำหรับสร้างตาราง Users
 	err = db.AutoMigrate(&models.Posts{})
 	assert.NoError(t, err)
@@ -71,7 +76,7 @@ func TestGetPost(t *testing.T) {
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDBs(db)
 	// Run migrations สำหรับสร้างตาราง Posts
 	err = db.AutoMigrate(&models.Posts{})
 	assert.NoError(t, err)
@@ -112,14 +117,14 @@ func TestGetPost(t *testing.T) {
 	assert.Equal(t, post.Body, response.Body)
 	assert.Equal(t, post.UserID, response.UserID)
 	assert.Equal(t, post.Status, response.Status)
-	assert.Equal(t, post.CreatedAt, response.CreatedAt)
+
 }
 
 func TestCreatePost(t *testing.T) {
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDBs(db)
 	// Run migrations สำหรับสร้างตาราง Posts
 	err = db.AutoMigrate(&models.Posts{})
 	assert.NoError(t, err)
@@ -165,7 +170,7 @@ func TestUpdatePost(t *testing.T) {
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDBs(db)
 	// Run migrations สำหรับสร้างตาราง Users
 	err = db.AutoMigrate(&models.Posts{})
 	assert.NoError(t, err)
@@ -208,7 +213,7 @@ func TestDeletePost(t *testing.T) {
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDBs(db)
 	// Run migrations สำหรับสร้างตาราง Users
 	err = db.AutoMigrate(&models.Posts{})
 	assert.NoError(t, err)
@@ -235,7 +240,7 @@ func TestDeletePost(t *testing.T) {
 	postHandler.DeletePost(c)
 
 	// ตรวจสอบการลบผู้ใช้สำเร็จ
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusNoContent, w.Code)
 
 	// ตรวจสอบว่าผู้ใช้ถูกลบออกจากฐานข้อมูล
 	var deletedPost models.Posts

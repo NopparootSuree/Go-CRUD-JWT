@@ -5,6 +5,7 @@ import (
 
 	"github.com/NopparootSuree/go-social/routers"
 	"github.com/NopparootSuree/go-social/utils"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -30,5 +31,6 @@ func main() {
 	routers.PostRouter(r, db)
 	routers.AuthenRouter(r, db)
 
+	r.Use(cors.Default())
 	r.Run(":8080")
 }

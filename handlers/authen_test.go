@@ -23,7 +23,7 @@ func TestRegisterUser(t *testing.T) {
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDB(db)
 	// Run migrations สำหรับสร้างตาราง Users
 	err = db.AutoMigrate(&models.Users{})
 	assert.NoError(t, err)
@@ -96,8 +96,8 @@ func TestLogin(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	// สร้างคำขอ HTTP POST ด้วยข้อมูล JSON สำหรับการเข้าสู่ระบบ
 	loginReq := handlers.LoginUserRequest{
-		Username: "admin123",
-		Password: "admin123",
+		Username: "john_doe",
+		Password: "password123",
 	}
 	loginJson, _ := json.Marshal(loginReq)
 

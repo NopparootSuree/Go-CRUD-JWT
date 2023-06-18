@@ -21,12 +21,17 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+func teardownTestDB(db *gorm.DB) {
+	db.Migrator().DropTable(&models.Users{})
+	db.Exec("DELETE FROM products")
+}
+
 func TestListUsers(t *testing.T) {
 	// เตรียมฐานข้อมูล MySQL ในการเชื่อมต่อกับฐานข้อมูลที่ใช้ในการทดสอบ
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDB(db)
 	// Run migrations สำหรับสร้างตาราง Users
 	err = db.AutoMigrate(&models.Users{})
 	assert.NoError(t, err)
@@ -91,7 +96,7 @@ func TestGetUser(t *testing.T) {
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDB(db)
 	// Run migrations สำหรับสร้างตาราง Users
 	err = db.AutoMigrate(&models.Users{})
 	assert.NoError(t, err)
@@ -141,7 +146,7 @@ func TestCreateUser(t *testing.T) {
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDB(db)
 	// Run migrations สำหรับสร้างตาราง Users
 	err = db.AutoMigrate(&models.Users{})
 	assert.NoError(t, err)
@@ -193,7 +198,7 @@ func TestUpdateUser(t *testing.T) {
 	dsn := "root:password@tcp(0.0.0.0:3307)/social?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
-
+	teardownTestDB(db)
 	// Run migrations สำหรับสร้างตาราง Users
 	err = db.AutoMigrate(&models.Users{})
 	assert.NoError(t, err)
@@ -240,6 +245,7 @@ func TestDeleteUser(t *testing.T) {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
+	teardownTestDB(db)
 	assert.NoError(t, err)
 
 	// Run migrations สำหรับสร้างตาราง Users
@@ -267,7 +273,7 @@ func TestDeleteUser(t *testing.T) {
 	userHandler.DeleteUser(c)
 
 	// ตรวจสอบการลบผู้ใช้สำเร็จ
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusNoContent, w.Code)
 
 	// ตรวจสอบว่าผู้ใช้ถูกลบออกจากฐานข้อมูล
 	var deletedUser models.Users

@@ -116,7 +116,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	// สร้าง Token
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// เข้ารหัส Token เป็นสตริง JWT โดยใช้คีย์สั่งลับ
+	// เข้ารหัส Token เป็นสตริง JWT โดยใช้คีย์ลับ
 	token, errSecretKey := jwtToken.SignedString(secretKey)
 	if errSecretKey != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": errSecretKey.Error()})

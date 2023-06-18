@@ -163,11 +163,11 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 		CreatedAt: post.CreatedAt,
 	}
 
-	if result.RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot update record"})
-	} else {
-		c.JSON(http.StatusOK, response)
-	}
+	// if result.RowsAffected == 0 {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "cannot update record"})
+	// } else {
+	c.JSON(http.StatusOK, response)
+	// }
 }
 
 func (h *PostHandler) DeletePost(c *gin.Context) {

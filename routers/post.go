@@ -13,6 +13,7 @@ func PostRouter(router *gin.Engine, db *gorm.DB) {
 	secretKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 	postHandler := handlers.NewPostHandler(db)
 	posts := router.Group("/posts", middlewares.JWTMiddleware(secretKey))
+
 	{
 		posts.GET("", postHandler.ListPosts)
 		posts.GET("/:id", postHandler.GetPost)
